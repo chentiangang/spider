@@ -1,0 +1,27 @@
+tasks:
+  - name: "project1"
+    schedule: "0 12 * * *"
+    cookie:
+      method: "chromedp"
+      update_interval: "24h"
+    request:
+      url: "https://api.example.com/data"
+      method: "GET"
+      headers:
+        Content-Type: "application/json"
+    storage:
+      type: "database"
+      connection: "db_connection_string"
+      replace_old: true
+  - name: "project2"
+    schedule: "0 6 * * *"
+    cookie:
+      method: "manual"
+    request:
+      url: "https://api.example2.com/data"
+      method: "POST"
+      body: '{"param": "value"}'
+    storage:
+      type: "file"
+      path: "/path/to/storage/file"
+      replace_old: false
