@@ -1,11 +1,11 @@
 tasks:
-  - name: "project1"
-    schedule: "0 12 * * *"
+  - name: "maxCompute"
+    schedule: "* * * * *"
     cookie:
       method: "chromedp"
       update_interval: "24h"
     request:
-      url: "https://api.example.com/data"
+      url: "https://example.com/"
       method: "GET"
       headers:
         Content-Type: "application/json"
@@ -13,15 +13,17 @@ tasks:
       type: "database"
       connection: "db_connection_string"
       replace_old: true
-  - name: "project2"
-    schedule: "0 6 * * *"
+  - name: "test test"
+    schedule: "*/2 * * * *"
     cookie:
-      method: "manual"
+      method: "chromedp"
+      update_interval: "24h"
     request:
-      url: "https://api.example2.com/data"
-      method: "POST"
-      body: '{"param": "value"}'
+      url: "https://example.com/"
+      method: "GET"
+      headers:
+        Content-Type: "application/json"
     storage:
-      type: "file"
-      path: "/path/to/storage/file"
-      replace_old: false
+      type: "database"
+      connection: "db_connection_string"
+      replace_old: true

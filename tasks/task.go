@@ -7,6 +7,8 @@ import (
 	"spider/parser"
 	"spider/request"
 	"spider/storage"
+
+	"github.com/chentiangang/xlog"
 )
 
 type Task struct {
@@ -21,7 +23,7 @@ type Task struct {
 func (t *Task) Init(config config.TaskConfig) error {
 	t.config = config
 	//t.client = request.NewAPIRequestManager()
-	cookie.NewChromedp(t.config.Cookie.Method)
+	//cookie.NewChromedp(t.config.Cookie.Method)
 	//t.parser =
 	//t.processor = &processor.DBProcessor{} // 根据配置选择处理器
 	return nil
@@ -32,6 +34,8 @@ func (t *Task) Execute() {
 	// 模拟浏览器获取 cookie
 	// 这里根据 t.config.CookieConfig 进行具体实现
 	// ...
+	xlog.Debug("%+v", t)
+	return
 
 	// 发送 HTTP 请求获取数据
 	cookie, err := t.cookie.GetCookie()
@@ -42,18 +46,19 @@ func (t *Task) Execute() {
 	if err != nil {
 		return
 	}
+	xlog.Debug("%s", bs)
 
 	// 处理数据
-	res, err := t.parser.Parse(bs)
-	if err != nil {
-		return
-	}
-
-	err = t.storage.Save(res)
-	if err != nil {
-		return
-	}
-
+	//res, err := t.parser.Parse(bs)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//err = t.storage.Save(res)
+	//if err != nil {
+	//	return
+	//}
+	//
 	log.Printf("Task %s executed successfully", t.config.Name)
 }
 

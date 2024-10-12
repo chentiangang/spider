@@ -3,6 +3,7 @@ module spider
 go 1.20
 
 require (
+	github.com/chentiangang/xlog v0.0.0-20240926064041-fafd2b19246c
 	github.com/chromedp/chromedp v0.10.0
 	github.com/robfig/cron/v3 v3.0.1
 	gopkg.in/yaml.v2 v2.4.0
