@@ -3,6 +3,9 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"spider/cookie"
+	"spider/parser"
+	"spider/storage"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -18,12 +21,14 @@ type TaskConfig struct {
 	Schedule string        `yaml:"schedule"`
 	Cookie   CookieConfig  `yaml:"cookie"`
 	Request  RequestConfig `yaml:"request"`
+	Parser   ParserConfig  `yaml:"parser"`
 	Storage  StorageConfig `yaml:"storage"`
 }
 
 type CookieConfig struct {
-	Method         string `yaml:"method"`
-	UpdateInterval string `yaml:"update_interval"`
+	FetcherName string         `yaml:"fetcher_name"`
+	Schedule    string         `yaml:"schedule"`
+	Fetcher     cookie.Fetcher `yaml:"-"`
 }
 
 type RequestConfig struct {
@@ -34,10 +39,14 @@ type RequestConfig struct {
 }
 
 type StorageConfig struct {
-	Type       string `yaml:"type"`
-	Connection string `yaml:"connection"`
-	Path       string `yaml:"path"`
-	ReplaceOld bool   `yaml:"replace_old"`
+	StorerName   string          `yaml:"storer_name"`
+	DatabaseName string          `yaml:"database_name"`
+	Store        storage.Storage `yaml:"-"`
+}
+
+type ParserConfig struct {
+	ParserName string        `yaml:"parser_name"`
+	Parser     parser.Parser `yaml:"-"`
 }
 
 // LoadConfig 加载主配置文件，并读取包含的所有子任务配置文件

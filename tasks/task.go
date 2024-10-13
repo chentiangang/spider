@@ -11,16 +11,16 @@ import (
 	"github.com/chentiangang/xlog"
 )
 
-type Task struct {
+type Task[T any] struct {
 	config  config.TaskConfig
-	client  request.Request
-	cookie  cookie.Cookie
-	parser  parser.Parser
-	storage storage.Storage
+	client  request.Requester
+	cookie  cookie.Fetcher
+	parser  parser.Parser[T]
+	storage storage.Storage[T]
 }
 
 // Init 包含了这个任务实例的初始化操作
-func (t *Task) Init(config config.TaskConfig) error {
+func (t *Task[T]) Init(config config.TaskConfig) error {
 	t.config = config
 	//t.client = request.NewAPIRequestManager()
 	//cookie.NewChromedp(t.config.Cookie.Method)
@@ -30,7 +30,7 @@ func (t *Task) Init(config config.TaskConfig) error {
 }
 
 // Execute 是该任务的执行函数
-func (t *Task) Execute() {
+func (t *Task[T]) Execute() {
 	// 模拟浏览器获取 cookie
 	// 这里根据 t.config.CookieConfig 进行具体实现
 	// ...
@@ -63,6 +63,6 @@ func (t *Task) Execute() {
 }
 
 // NewTask 是新建一个任务实例
-func NewTask() Task {
+func NewTask(config config.TaskConfig) Task[T] {
 	return Task{}
 }

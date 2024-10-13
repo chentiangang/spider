@@ -1,5 +1,5 @@
 package parser
 
-type Parser interface {
-	Parse(response []byte) (interface{}, error)
+type Parser[T any] interface {
+	Parse(response []byte) (T, error)
 }
