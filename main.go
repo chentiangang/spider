@@ -31,6 +31,10 @@ func main() {
 			log.Printf("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
 			continue
 		}
+		if err := sched.AddTask(taskCfg.Cookie.Schedule, taskCfg.Cookie.Fetcher.Update); err != nil {
+			log.Printf("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
+			continue
+		}
 	}
 
 	// 启动调度器

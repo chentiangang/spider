@@ -8,7 +8,7 @@ import (
 type Fetcher interface {
 	Get() ([]*http.Cookie, error)
 	String() string
-	Update() error
+	Update()
 }
 
 type Manager struct {

@@ -26,6 +26,14 @@ func (s *Scheduler) AddTask(schedule string, task func()) error {
 	return nil
 }
 
+//func (s *Scheduler) AddCookieUpdate(schedule string, task func()) error {
+//	_, err := s.cron.AddFunc(schedule, task)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
+
 // Start 开始调度
 func (s *Scheduler) Start() {
 	s.cron.Start()
