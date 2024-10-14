@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type Request interface {
+type Requester interface {
 	SendRequest(cookie string) ([]byte, error)
 }
 
@@ -58,16 +58,16 @@ func (r *APIRequestManager) SendRequest(cookie string) ([]byte, error) {
 }
 
 // 装饰器：增加重试机制
-func WithRetry(r Request, retries int, delay time.Duration) Request {
+func WithRetry(r Requester, retries int, delay time.Duration) Requester {
 	return &retryRequestManager{
-		Request: r,
-		retries: retries,
-		delay:   delay,
+		Requester: r,
+		retries:   retries,
+		delay:     delay,
 	}
 }
 
 type retryRequestManager struct {
-	Request
+	Requester
 	retries int
 	delay   time.Duration
 }
@@ -76,7 +76,7 @@ func (r *retryRequestManager) SendRequest(cookie string) ([]byte, error) {
 	var err error
 	for i := 0; i <= r.retries; i++ {
 		var response []byte
-		response, err = r.Request.SendRequest(cookie)
+		response, err = r.Requester.SendRequest(cookie)
 		if err == nil {
 			return response, nil
 		}
