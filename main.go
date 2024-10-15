@@ -24,17 +24,16 @@ func main() {
 	// 创建调度器
 	sched := scheduler.NewScheduler()
 	for _, i := range cfg.Tasks {
-		tasks := cookie.GenerateTasks(i.Cookie.Actions)
-		cookieServer := cookie.NewChromedp(i.Cookie.URL, tasks)
-		cookieServer.Update()
-		cookieManager.Register(i.Cookie.Name, cookieServer)
-		sched.AddTask(i.Cookie.Schedule, cookieServer.Update)
+		cookieFetcher := cookie.CreateFetcher(i.Cookie.Actions, i.Cookie.URL, i.Name)
+		cookieFetcher.Update()
+		cookieManager.Register(i.Cookie.Name, cookieFetcher)
+		sched.AddTask(i.Cookie.Schedule, cookieFetcher.Update)
 	}
 
 	// 初始化并添加任务
 	for _, taskCfg := range cfg.Tasks {
 		var task tasks.Task[float64]
-		if err := task.Init(taskCfg, cookieManager.Get); err != nil {
+		if err := task.Init(taskCfg, cookieManager.GetCookie); err != nil {
 			log.Printf("Failed to init task %s: %v", taskCfg.Name, err)
 			continue
 		}

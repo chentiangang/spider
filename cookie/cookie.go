@@ -1,8 +1,23 @@
 package cookie
 
+import "log"
+
 type Fetcher interface {
 	String() string
 	Update()
+}
+
+func CreateFetcher(actions []Action, name string, url string) Fetcher {
+	tasks := GenerateTasks(actions)
+	switch name {
+	case "ProjectA":
+		return NewProjectAChromedp(config.URL, tasks)
+	case "ProjectB":
+		return NewProjectBChromedp(config.URL, tasks)
+	default:
+		log.Fatalf("Unknown project name: %s", name)
+		return nil
+	}
 }
 
 type Manager struct {
@@ -14,7 +29,7 @@ func (m *Manager) Register(name string, fetcher Fetcher) {
 	m.fetchers[name] = fetcher
 }
 
-func (m *Manager) Get(name string) string {
+func (m *Manager) GetCookie(name string) string {
 	return m.fetchers[name].String()
 }
 
