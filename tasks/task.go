@@ -38,10 +38,12 @@ func (t *Task[T]) Execute() {
 	return
 
 	// 发送 HTTP 请求获取数据
-	cookie, err := t.cookie.GetCookie()
-	if err != nil {
+	cookie := t.cookie.String()
+	if cookie == "" {
+		xlog.Error("cookie is empty")
 		return
 	}
+
 	bs, err := t.client.SendRequest(cookie)
 	if err != nil {
 		return
@@ -63,6 +65,6 @@ func (t *Task[T]) Execute() {
 }
 
 // NewTask 是新建一个任务实例
-func NewTask(config config.TaskConfig) Task[T] {
-	return Task{}
-}
+//func NewTask(config config.TaskConfig) Task[T] {
+//	return Task{}
+//}

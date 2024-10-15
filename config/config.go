@@ -24,10 +24,10 @@ type TaskConfig struct {
 }
 
 type CookieConfig struct {
-	Actions []cookie.Action `yaml:"actions"`
-	//FetcherName string              `yaml:"fetcher_name"`
-	Schedule string `yaml:"schedule"`
-	//Fetcher  cookie.Fetcher `yaml:"-"`
+	Name     string          `yaml:"name"`
+	URL      string          `yaml:"url"`
+	Actions  []cookie.Action `yaml:"actions"`
+	Schedule string          `yaml:"schedule"`
 }
 
 type RequestConfig struct {

@@ -44,7 +44,6 @@ func GenerateTasks(actions []Action) chromedp.Tasks {
 			log.Printf("Unknown action type: %s", action.Type)
 		}
 	}
-
 	return tasks
 }
 
@@ -63,37 +62,37 @@ func getBy(by string) chromedp.QueryOption {
 }
 
 type Chromedp struct {
-	url           string
-	cookies       []*network.Cookie
-	updateCycle   time.Duration // 更新周期
-	lastUpdated   time.Time
-	browserAction BrowserAction // 项目特定的操作链
+	url         string
+	cookies     []*network.Cookie
+	updateCycle time.Duration // 更新周期
+	lastUpdated time.Time
+	actions     chromedp.Tasks // 项目特定的操作链
 }
 
 // BrowserAction 定义一个浏览器操作的函数类型
 type BrowserAction func() chromedp.Tasks
 
 // NewChromedpCookieManager 允许传入不同的浏览器操作
-func NewChromedp(url string, updateCycle time.Duration, action BrowserAction) *Chromedp {
+func NewChromedp(url string, action chromedp.Tasks) *Chromedp {
 	return &Chromedp{
-		url:           url,
-		updateCycle:   updateCycle,
-		lastUpdated:   time.Time{},
-		browserAction: action,
+		url: url,
+		//updateCycle:   updateCycle,
+		//lastUpdated:   time.Time{},
+		actions: action,
 	}
 }
 
-// GetCookie 获取并返回 Cookie
-func (cm *Chromedp) GetCookie() error {
-	if time.Since(cm.lastUpdated) > cm.updateCycle {
-		if err := cm.UpdateCookie(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (cm *Chromedp) UpdateCookie() error {
+// // GetCookie 获取并返回 Cookie
+//
+//	func (cm *Chromedp) GetCookie() error {
+//		if time.Since(cm.lastUpdated) > cm.updateCycle {
+//			if err := cm.UpdateCookie(); err != nil {
+//				return err
+//			}
+//		}
+//		return nil
+//	}
+func (cm *Chromedp) Update() {
 	opts := []chromedp.ExecAllocatorOption{
 		chromedp.Flag("headless", false),
 		chromedp.Flag("test-type", true),
@@ -115,7 +114,7 @@ func (cm *Chromedp) UpdateCookie() error {
 	var err error
 	err = chromedp.Run(timeoutCtx, chromedp.Navigate(cm.url),
 		chromedp.WaitVisible("#kw", chromedp.ByID),
-		cm.browserAction(),
+		cm.actions,
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			// 使用 chromedp.Cookies 获取所有 cookies
 			cookies, err = network.GetCookies().Do(ctx)
@@ -123,9 +122,13 @@ func (cm *Chromedp) UpdateCookie() error {
 		}))
 	if err != nil {
 		log.Println(err)
-		return err
+		return
 	}
 	cm.cookies = cookies
 	cm.lastUpdated = time.Now()
-	return nil
+	return
+}
+
+func (cm *Chromedp) String() string {
+	return ""
 }

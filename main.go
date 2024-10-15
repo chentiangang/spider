@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"spider/config"
+	"spider/cookie"
 	"spider/scheduler"
 	"spider/tasks"
 )
@@ -16,22 +17,23 @@ func main() {
 
 	// 创建调度器
 	sched := scheduler.NewScheduler()
+	var cookieManager cookie.Manager
+	for _, i := range cfg.Tasks {
+		tasks := cookie.GenerateTasks(i.Cookie.Actions)
+		cookieServer := cookie.NewChromedp(i.Cookie.URL, tasks)
+		cookieServer.Update()
+		cookieManager.Register(i.Cookie.Name, cookieServer)
+		sched.AddTask(i.Cookie.Schedule, cookieServer.Update)
+	}
 
 	// 初始化并添加任务
 	for _, taskCfg := range cfg.Tasks {
-		var task tasks.Task
-		// 根据任务类型选择具体任务实现
-		// 这里假设所有任务都是 Task，可以根据实际需求扩展
-		task = tasks.NewTask()
+		var task tasks.Task[float64]
 		if err := task.Init(taskCfg); err != nil {
 			log.Printf("Failed to init task %s: %v", taskCfg.Name, err)
 			continue
 		}
 		if err := sched.AddTask(taskCfg.Schedule, task.Execute); err != nil {
-			log.Printf("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
-			continue
-		}
-		if err := sched.AddTask(taskCfg.Cookie.Schedule, taskCfg.Cookie.Fetcher.Update); err != nil {
 			log.Printf("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
 			continue
 		}
