@@ -2,11 +2,10 @@ package cookie
 
 import (
 	"fmt"
-	"net/http"
 )
 
 type Fetcher interface {
-	Get() ([]*http.Cookie, error)
+	Fetch() error
 	String() string
 	Update()
 }
@@ -21,11 +20,15 @@ func (m *Manager) Register(name string, fetcher Fetcher) {
 }
 
 // 获取指定名称的 Cookie
-func (m *Manager) GetCookies(name string) ([]*http.Cookie, error) {
+func (m *Manager) GetCookies(name string) (string, error) {
 	if fetcher, ok := m.fetchers[name]; ok {
-		return fetcher.Get()
+		err := fetcher.Fetch()
+		if err != nil {
+			return "", err
+		}
+		return fetcher.String(), nil
 	}
-	return nil, fmt.Errorf("fetcher not found: %s", name)
+	return "", fmt.Errorf("fetcher not found: %s", name)
 }
 
 // 定时更新所有 Cookie
