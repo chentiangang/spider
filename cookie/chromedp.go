@@ -16,6 +16,7 @@ const (
 	ActionClick    ActionType = "click"    // 点击操作
 	ActionSendKeys ActionType = "sendKeys" // 输入文本操作
 	ActionSubmit   ActionType = "submit"   // 提交表单操作
+	ActionWait     ActionType = "wait"
 	// 你可以根据需要扩展更多类型
 )
 
@@ -40,6 +41,8 @@ func GenerateTasks(actions []Action) chromedp.Tasks {
 			tasks = append(tasks, chromedp.Click(action.Selector, getBy(action.By)))
 		case ActionSubmit:
 			tasks = append(tasks, chromedp.Submit(action.Selector, getBy(action.By)))
+		case ActionWait:
+			tasks = append(tasks, chromedp.WaitVisible(action.Selector, getBy(action.By)))
 		default:
 			log.Printf("Unknown action type: %s", action.Type)
 		}
@@ -98,7 +101,7 @@ func (cm *Chromedp) Update() {
 	var cookies []*network.Cookie
 	var err error
 	err = chromedp.Run(timeoutCtx, chromedp.Navigate(cm.url),
-		chromedp.WaitVisible("#kw", chromedp.ByID),
+		//chromedp.WaitVisible("#kw", chromedp.ByID),
 		cm.actions,
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			// 使用 chromedp.Cookies 获取所有 cookies
