@@ -12,7 +12,6 @@ func MockBrowserAction() chromedp.Tasks {
 	// 模拟设置 cookie 的操作
 	return chromedp.Tasks{
 		chromedp.SendKeys(`#kw`, "为什么", chromedp.ByID),
-		chromedp.Click(),
 		chromedp.Submit(`#su`, chromedp.ByID),
 		//chromedp.Sleep(1 * time.Second),
 	}
