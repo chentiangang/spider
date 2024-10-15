@@ -1,7 +1,6 @@
 package cookie
 
 type Fetcher interface {
-	//Fetch() error
 	String() string
 	Update()
 }

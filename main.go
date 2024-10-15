@@ -8,6 +8,12 @@ import (
 	"spider/tasks"
 )
 
+var cookieManager cookie.Manager
+
+func init() {
+	//cookieManager.Register("")
+}
+
 func main() {
 	// 加载配置
 	cfg, err := config.LoadConfig("config.yml")
@@ -17,7 +23,6 @@ func main() {
 
 	// 创建调度器
 	sched := scheduler.NewScheduler()
-	var cookieManager cookie.Manager
 	for _, i := range cfg.Tasks {
 		tasks := cookie.GenerateTasks(i.Cookie.Actions)
 		cookieServer := cookie.NewChromedp(i.Cookie.URL, tasks)

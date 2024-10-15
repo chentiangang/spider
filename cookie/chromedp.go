@@ -19,7 +19,7 @@ const (
 	// 你可以根据需要扩展更多类型
 )
 
-// BrowserAction 定义了一个浏览器动作
+// Action 定义了一个浏览器动作
 type Action struct {
 	Type     ActionType `yaml:"type"`     // 动作类型 (click, sendKeys, submit)
 	Selector string     `yaml:"selector"` // 元素选择器
@@ -69,29 +69,14 @@ type Chromedp struct {
 	actions     chromedp.Tasks // 项目特定的操作链
 }
 
-// BrowserAction 定义一个浏览器操作的函数类型
-type BrowserAction func() chromedp.Tasks
-
-// NewChromedpCookieManager 允许传入不同的浏览器操作
+// NewChromedp 允许传入不同的浏览器操作
 func NewChromedp(url string, action chromedp.Tasks) *Chromedp {
 	return &Chromedp{
-		url: url,
-		//updateCycle:   updateCycle,
-		//lastUpdated:   time.Time{},
+		url:     url,
 		actions: action,
 	}
 }
 
-// // GetCookie 获取并返回 Cookie
-//
-//	func (cm *Chromedp) GetCookie() error {
-//		if time.Since(cm.lastUpdated) > cm.updateCycle {
-//			if err := cm.UpdateCookie(); err != nil {
-//				return err
-//			}
-//		}
-//		return nil
-//	}
 func (cm *Chromedp) Update() {
 	opts := []chromedp.ExecAllocatorOption{
 		chromedp.Flag("headless", false),
@@ -125,7 +110,6 @@ func (cm *Chromedp) Update() {
 		return
 	}
 	cm.cookies = cookies
-	cm.lastUpdated = time.Now()
 	return
 }
 
