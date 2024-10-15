@@ -3,7 +3,6 @@ package tasks
 import (
 	"log"
 	"spider/config"
-	"spider/cookie"
 	"spider/parser"
 	"spider/request"
 	"spider/storage"
@@ -14,14 +13,16 @@ import (
 type Task[T any] struct {
 	config  config.TaskConfig
 	client  request.Requester
-	cookie  cookie.Fetcher
+	cookie  func(name string) string
 	parser  parser.Parser[T]
 	storage storage.Storage[T]
 }
 
 // Init 包含了这个任务实例的初始化操作
-func (t *Task[T]) Init(config config.TaskConfig) error {
+func (t *Task[T]) Init(config config.TaskConfig, cookieFunc func(name string) string) error {
 	t.config = config
+
+	t.cookie = cookieFunc
 	//t.client = request.NewAPIRequestManager()
 	//cookie.NewChromedp(t.config.Cookie.Method)
 	//t.parser =
@@ -38,7 +39,7 @@ func (t *Task[T]) Execute() {
 	return
 
 	// 发送 HTTP 请求获取数据
-	cookie := t.cookie.String()
+	cookie := t.cookie(t.config.Cookie.Name)
 	if cookie == "" {
 		xlog.Error("cookie is empty")
 		return

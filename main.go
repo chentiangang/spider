@@ -29,7 +29,7 @@ func main() {
 	// 初始化并添加任务
 	for _, taskCfg := range cfg.Tasks {
 		var task tasks.Task[float64]
-		if err := task.Init(taskCfg); err != nil {
+		if err := task.Init(taskCfg, cookieManager.Get); err != nil {
 			log.Printf("Failed to init task %s: %v", taskCfg.Name, err)
 			continue
 		}
