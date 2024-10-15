@@ -65,9 +65,9 @@ func getBy(by string) chromedp.QueryOption {
 }
 
 type Chromedp struct {
-	url         string
-	cookies     []*network.Cookie
-	updateCycle time.Duration // 更新周期
+	url     string
+	cookies []*network.Cookie
+	//updateCycle time.Duration // 更新周期
 	lastUpdated time.Time
 	actions     chromedp.Tasks // 项目特定的操作链
 }
@@ -116,6 +116,6 @@ func (cm *Chromedp) Update() {
 	return
 }
 
-func (cm *Chromedp) String() string {
-	return ""
-}
+//func (cm *Chromedp) String() string {
+//	return ""
+//}
