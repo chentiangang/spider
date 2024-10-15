@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"spider/cookie"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -23,7 +24,7 @@ type TaskConfig struct {
 }
 
 type CookieConfig struct {
-	Actions []map[string]string `yaml:"actions"`
+	Actions []cookie.Action `yaml:"actions"`
 	//FetcherName string              `yaml:"fetcher_name"`
 	Schedule string `yaml:"schedule"`
 	//Fetcher  cookie.Fetcher `yaml:"-"`
