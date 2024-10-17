@@ -79,3 +79,32 @@ func (r *Request) SendRequest(cookie string) (bs []byte, err error) {
 	}
 	return bs, err
 }
+
+//// 装饰器：增加重试机制
+//func WithRetry(r Requester, retries int, delay time.Duration) Requester {
+//	return &retryRequestManager{
+//		Requester: r,
+//		retries:   retries,
+//		delay:     delay,
+//	}
+//}
+//
+//type retryRequestManager struct {
+//	Requester
+//	retries int
+//	delay   time.Duration
+//}
+//
+//func (r *retryRequestManager) SendRequest(cookie string) ([]byte, error) {
+//	var err error
+//	for i := 0; i <= r.retries; i++ {
+//		var response []byte
+//		response, err = r.Requester.SendRequest(cookie)
+//		if err == nil {
+//			return response, nil
+//		}
+//		log.Printf("Request failed, retrying in %v: %v", r.delay, err)
+//		time.Sleep(r.delay)
+//	}
+//	return nil, err
+//}

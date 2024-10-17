@@ -25,6 +25,7 @@ func (h *ProjectSummaryHandler) Init(cfg config.TaskConfig) error {
 	h.RespCh = make(chan ProjectSummaryResponse)
 	var err error
 	h.req, err = NewRequest(cfg.Request)
+	h.db = NewConn(cfg.Storage)
 	if err != nil {
 		xlog.Error("Failed to init Handler %s, err: %s:", h.Name(), err)
 		return err
@@ -57,6 +58,7 @@ func (h *ProjectSummaryHandler) ParseToChan(data <-chan []byte) {
 
 func (h *ProjectSummaryHandler) Store() {
 	go func() {
+		defer h.db.Close()
 		for item := range h.RespCh {
 			_, err := h.db.Exec("insert into", item.Data)
 			if err != nil {
