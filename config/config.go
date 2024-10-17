@@ -15,19 +15,19 @@ type Config struct {
 
 // TaskConfig 是任务的结构体定义
 type TaskConfig struct {
-	Name     string        `yaml:"name"`
-	Schedule string        `yaml:"schedule"`
-	Cookie   CookieConfig  `yaml:"cookie"`
-	Request  RequestConfig `yaml:"request"`
-	Parser   ParserConfig  `yaml:"parser"`
-	Storage  StorageConfig `yaml:"storage"`
+	Name        string        `yaml:"name"`
+	Schedule    string        `yaml:"schedule"`
+	HandlerName string        `yaml:"handler_name"`
+	Cookie      CookieConfig  `yaml:"cookie"`
+	Request     RequestConfig `yaml:"request"`
+	Storage     StorageConfig `yaml:"storage"`
 }
 
 type CookieConfig struct {
-	Name     string          `yaml:"name"`
-	LoginURL string          `yaml:"login_url"`
-	Actions  []cookie.Action `yaml:"actions"`
-	Schedule string          `yaml:"schedule"`
+	FetcherName string          `yaml:"fetcher_name"`
+	LoginURL    string          `yaml:"login_url"`
+	Actions     []cookie.Action `yaml:"actions"`
+	Schedule    string          `yaml:"schedule"`
 }
 
 type RequestConfig struct {
@@ -42,11 +42,6 @@ type StorageConfig struct {
 	StorerName   string `yaml:"storer_name"`
 	DatabaseName string `yaml:"database_name"`
 	//Store        storage.Storage[T] `yaml:"-"`
-}
-
-type ParserConfig struct {
-	ParserName string `yaml:"parser_name"`
-	//Parser     parser.Parser[T] `yaml:"-"`
 }
 
 // LoadConfig 加载主配置文件，并读取包含的所有子任务配置文件

@@ -13,10 +13,10 @@ func NewProjectSummaryRequest(cfg config.RequestConfig) ProjectSummaryRequester 
 }
 
 func (p ProjectSummaryRequester) SendRequest(cookie string) <-chan []byte {
-	data := make(chan []byte)
-	go func() {
-		p.req.SendRequest(cookie)
-
-	}()
+	//data := make(chan []byte)
+	//go func() {
+	//	p.req.SendRequest(cookie)
+	//
+	//}()
 	return nil
 }

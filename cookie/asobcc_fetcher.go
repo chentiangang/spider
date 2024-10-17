@@ -13,7 +13,12 @@ type AsoBccFetcher struct {
 	*Chromedp
 }
 
-func (a AsoBccFetcher) String() string {
+func (a *AsoBccFetcher) Init(actions []Action, url string) {
+	tasks := GenerateTasks(actions)
+	a.Chromedp = NewChromedp(url, tasks)
+}
+
+func (a *AsoBccFetcher) String() string {
 	cookies := make(map[string]string)
 	for _, i := range a.cookies {
 		cookies[i.Name] = i.Value
@@ -69,4 +74,8 @@ func bccSSOToken(cookie string) string {
 
 	}
 	return resp.Header.Get("set-cookie")
+}
+
+func (a *AsoBccFetcher) Name() string {
+	return "asobcc_fetcher"
 }

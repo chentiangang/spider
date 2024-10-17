@@ -1,24 +1,26 @@
 package cookie
 
-import (
-	"log"
-)
-
 type Fetcher interface {
+	Init(actions []Action, url string)
 	String() string
 	Update()
+	Name() string
+}
+
+var Fetchers []Fetcher
+
+func init() {
+	Fetchers = append(Fetchers, &AsoBccFetcher{})
 }
 
 func CreateFetcher(actions []Action, name string, url string) Fetcher {
-	tasks := GenerateTasks(actions)
-	switch name {
-	case "asobcc":
-		fetcher := NewChromedp(url, tasks)
-		return AsoBccFetcher{fetcher}
-	default:
-		log.Fatalf("Unknown project name: %s", name)
-		return nil
+	for _, fetcher := range Fetchers {
+		if name == fetcher.Name() {
+			fetcher.Init(actions, url)
+			return fetcher
+		}
 	}
+	return nil
 }
 
 type Manager struct {
