@@ -67,33 +67,27 @@ func BuildRequest(cfg config.RequestConfig) (*http.Request, error) {
 	return req, nil
 }
 
-func (r *APIRequest) SendRequest(cookie string) <-chan []byte {
+func (r *APIRequest) SendRequest(cookie string) (bs []byte, err error) {
 	client := newClient()
 
-	res := make(chan []byte)
+	r.req.Header.Set("Cookie", cookie)
+	resp, err := client.Do(r.req)
+	if err != nil {
+		xlog.Error("%s", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		xlog.Error("received non-200 response code")
+		return
+	}
 
-	go func() {
-		defer close(res)
-		r.req.Header.Set("Cookie", cookie)
-		resp, err := client.Do(r.req)
-		if err != nil {
-			xlog.Error("%s", err)
-			return
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != 200 {
-			xlog.Error("received non-200 response code")
-			return
-		}
+	bs, err = io.ReadAll(resp.Body)
+	if err != nil {
+		xlog.Error("failed to read response body,%s", err)
+	}
 
-		bs, err := io.ReadAll(resp.Body)
-		if err != nil {
-			xlog.Error("failed to read response body,%s", err)
-		}
-		res <- bs
-
-	}()
-	return res
+	return
 }
 
 //// 装饰器：增加重试机制
