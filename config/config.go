@@ -35,6 +35,7 @@ type RequestConfig struct {
 	Method  string            `yaml:"method"`
 	Headers map[string]string `yaml:"headers"`
 	Body    string            `yaml:"body"`
+	Params  map[string]string `yaml:"params"`
 }
 
 type StorageConfig struct {

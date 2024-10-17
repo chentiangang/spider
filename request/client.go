@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func NewClient() *http.Client {
+func newClient() *http.Client {
 	return &http.Client{
 		Timeout: time.Second * 10,
 		Transport: &http.Transport{

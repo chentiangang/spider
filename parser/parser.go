@@ -1,6 +1,10 @@
 package parser
 
-import "github.com/chentiangang/xlog"
+import (
+	"encoding/json"
+
+	"github.com/chentiangang/xlog"
+)
 
 type Parser interface {
 	Parse(response []byte) error
@@ -9,15 +13,20 @@ type Parser interface {
 func CreateParserWithAPI(api string) Parser {
 	switch api {
 	case "/gateway/v2/apps/california/project/proprietary_cloud/get_project_info_summary":
-		return ProjectSummaryResp{}
+		return &ProjectSummaryRespParser{}
 	default:
 		xlog.Error("Unknown api %s", api)
 		return nil
 	}
 }
 
-type ProjectSummaryResp struct{}
+type ProjectSummaryRespParser struct{}
 
-func (p ProjectSummaryResp) Parse(data []byte) error {
+func (p *ProjectSummaryRespParser) Parse(data []byte) error {
+	err := json.Unmarshal(data, &p)
+	if err != nil {
+		xlog.Error("Unmarshal err %v", err)
+		return err
+	}
 	return nil
 }

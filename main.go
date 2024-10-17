@@ -4,8 +4,8 @@ import (
 	"log"
 	"spider/config"
 	"spider/cookie"
-	"spider/parser"
 	"spider/scheduler"
+	"spider/tasks"
 )
 
 var cookieManager cookie.Manager
@@ -32,8 +32,9 @@ func main() {
 
 	// 初始化并添加任务
 	for _, taskCfg := range cfg.Tasks {
-		parser := parser.CreateParserWithAPI(taskCfg.Request.URL)
-		parser.Parse()
+		//parser := parser.CreateParserWithAPI(taskCfg.Request.URL)
+		//parser.Parse()
+		var task tasks.Task
 		if err := task.Init(taskCfg, cookieManager.GetCookie); err != nil {
 			log.Printf("Failed to init task %s: %v", taskCfg.Name, err)
 			continue

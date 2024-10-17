@@ -5,25 +5,24 @@ import (
 	"spider/config"
 	"spider/parser"
 	"spider/request"
-	"spider/storage"
 
 	"github.com/chentiangang/xlog"
 )
 
-type Task[T any] struct {
+type Task struct {
 	config  config.TaskConfig
-	client  request.Requester
+	request request.Requester
 	cookie  func(name string) string
 	parser  parser.Parser
-	storage storage.Storage[T]
+	//storage storage.Storage[
 }
 
 // Init 包含了这个任务实例的初始化操作
-func (t *Task[T]) Init(config config.TaskConfig, cookieFunc func(name string) string) error {
+func (t *Task) Init(config config.TaskConfig, cookieFunc func(name string) string) error {
 	t.config = config
-
 	t.cookie = cookieFunc
-	//t.client = request.NewAPIRequestManager()
+	t.request = request.NewAPIRequest(config.Request)
+	//t.request.SendRequest()
 	//cookie.NewChromedp(t.config.Cookie.Method)
 	//t.parser =
 	//t.processor = &processor.DBProcessor{} // 根据配置选择处理器
@@ -31,7 +30,7 @@ func (t *Task[T]) Init(config config.TaskConfig, cookieFunc func(name string) st
 }
 
 // Execute 是该任务的执行函数
-func (t *Task[T]) Execute() {
+func (t *Task) Execute() {
 	// 模拟浏览器获取 cookie
 	// 这里根据 t.config.CookieConfig 进行具体实现
 	// ...
@@ -45,7 +44,7 @@ func (t *Task[T]) Execute() {
 		return
 	}
 
-	bs, err := t.client.SendRequest(cookie)
+	bs, err := t.request.SendRequest(cookie)
 	if err != nil {
 		return
 	}
