@@ -4,8 +4,8 @@ import (
 	"log"
 	"spider/config"
 	"spider/cookie"
+	"spider/parser"
 	"spider/scheduler"
-	"spider/tasks"
 )
 
 var cookieManager cookie.Manager
@@ -24,7 +24,7 @@ func main() {
 	// 创建调度器
 	sched := scheduler.NewScheduler()
 	for _, i := range cfg.Tasks {
-		cookieFetcher := cookie.CreateFetcher(i.Cookie.Actions, i.Cookie.URL, i.Name)
+		cookieFetcher := cookie.CreateFetcher(i.Cookie.Actions, i.Cookie.Name, i.Cookie.LoginURL)
 		cookieFetcher.Update()
 		cookieManager.Register(i.Cookie.Name, cookieFetcher)
 		sched.AddTask(i.Cookie.Schedule, cookieFetcher.Update)
@@ -32,7 +32,8 @@ func main() {
 
 	// 初始化并添加任务
 	for _, taskCfg := range cfg.Tasks {
-		var task tasks.Task[float64]
+		parser := parser.CreateParserWithAPI(taskCfg.Request.URL)
+		parser.Parse()
 		if err := task.Init(taskCfg, cookieManager.GetCookie); err != nil {
 			log.Printf("Failed to init task %s: %v", taskCfg.Name, err)
 			continue

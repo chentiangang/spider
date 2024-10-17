@@ -12,11 +12,9 @@ type Fetcher interface {
 func CreateFetcher(actions []Action, name string, url string) Fetcher {
 	tasks := GenerateTasks(actions)
 	switch name {
-	case "baidu":
+	case "asobcc":
 		fetcher := NewChromedp(url, tasks)
-		return BaiduFetcher{fetcher}
-	//case "ProjectB":
-	//	return NewProjectBChromedp(config.URL, tasks)
+		return AsoBccFetcher{fetcher}
 	default:
 		log.Fatalf("Unknown project name: %s", name)
 		return nil
@@ -29,6 +27,9 @@ type Manager struct {
 
 // 注册获取器到主获取器
 func (m *Manager) Register(name string, fetcher Fetcher) {
+	if m.fetchers == nil {
+		m.fetchers = make(map[string]Fetcher)
+	}
 	m.fetchers[name] = fetcher
 }
 

@@ -2,9 +2,10 @@ package cookie
 
 import (
 	"context"
-	"log"
+	"strconv"
 	"time"
 
+	"github.com/chentiangang/xlog"
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 )
@@ -17,6 +18,7 @@ const (
 	ActionSendKeys ActionType = "sendKeys" // 输入文本操作
 	ActionSubmit   ActionType = "submit"   // 提交表单操作
 	ActionWait     ActionType = "wait"
+	ActionSleep    ActionType = "sleep"
 	// 你可以根据需要扩展更多类型
 )
 
@@ -43,8 +45,16 @@ func GenerateTasks(actions []Action) chromedp.Tasks {
 			tasks = append(tasks, chromedp.Submit(action.Selector, getBy(action.By)))
 		case ActionWait:
 			tasks = append(tasks, chromedp.WaitVisible(action.Selector, getBy(action.By)))
+		case ActionSleep:
+			n, err := strconv.Atoi(action.Value)
+			if err != nil {
+				xlog.Error("%s", err)
+				tasks = append(tasks, chromedp.Sleep(time.Second))
+			} else {
+				tasks = append(tasks, chromedp.Sleep(time.Second*time.Duration(n)))
+			}
 		default:
-			log.Printf("Unknown action type: %s", action.Type)
+			xlog.Error("Unknown action type: %s", action.Type)
 		}
 	}
 	return tasks
@@ -101,21 +111,15 @@ func (cm *Chromedp) Update() {
 	var cookies []*network.Cookie
 	var err error
 	err = chromedp.Run(timeoutCtx, chromedp.Navigate(cm.url),
-		//chromedp.WaitVisible("#kw", chromedp.ByID),
 		cm.actions,
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			// 使用 chromedp.Cookies 获取所有 cookies
 			cookies, err = network.GetCookies().Do(ctx)
 			return err
 		}))
 	if err != nil {
-		log.Println(err)
+		xlog.Error("%s", err)
 		return
 	}
 	cm.cookies = cookies
 	return
 }
-
-//func (cm *Chromedp) String() string {
-//	return ""
-//}

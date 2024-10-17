@@ -1,3 +1,4 @@
 vendor
 spider
 *.exe
+config.yml

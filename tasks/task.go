@@ -14,7 +14,7 @@ type Task[T any] struct {
 	config  config.TaskConfig
 	client  request.Requester
 	cookie  func(name string) string
-	parser  parser.Parser[T]
+	parser  parser.Parser
 	storage storage.Storage[T]
 }
 

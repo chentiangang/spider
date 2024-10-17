@@ -25,7 +25,7 @@ type TaskConfig struct {
 
 type CookieConfig struct {
 	Name     string          `yaml:"name"`
-	URL      string          `yaml:"url"`
+	LoginURL string          `yaml:"login_url"`
 	Actions  []cookie.Action `yaml:"actions"`
 	Schedule string          `yaml:"schedule"`
 }
