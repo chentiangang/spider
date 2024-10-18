@@ -61,7 +61,6 @@ type Item struct {
 func (h *ProjectSummaryHandler) Init(cfg config.TaskConfig) error {
 	h.RespCh = make(chan ProjectSummaryResponse)
 	var err error
-	h.req, err = NewRequest(cfg.Request)
 	h.reqConfig = cfg.Request
 	h.db = NewConn(cfg.Storage)
 	if err != nil {
@@ -81,6 +80,8 @@ func (h *ProjectSummaryHandler) SendRequest(cookie string) <-chan []byte {
 
 	go func() {
 		defer close(data)
+		var err error
+		h.req, err = NewRequest(h.reqConfig)
 		bs, err := h.req.SendRequest(cookie)
 		if err != nil {
 			xlog.Error("Failed to send request cookie: %s, err: %s", cookie, err)
@@ -89,9 +90,9 @@ func (h *ProjectSummaryHandler) SendRequest(cookie string) <-chan []byte {
 
 		res := h.parse(bs)
 
-		h.config.Params["pageNum"] = "1"
-		h.config.Params["pageSize"] = fmt.Sprintf("%d", res.Data.Total)
-		h.req, err = NewRequest(h.config)
+		h.reqConfig.Params["pageNum"] = "1"
+		h.reqConfig.Params["pageSize"] = fmt.Sprintf("%d", res.Data.Total)
+		h.req, err = NewRequest(h.reqConfig)
 		if err != nil {
 			xlog.Error("%s", err)
 			return
