@@ -23,12 +23,8 @@ func (t *Task) Execute() {
 		return
 	}
 
-	bs, err := t.handler.SendRequest(cookie)
-	if err != nil {
-		return
-	}
-
-	t.handler.ParseToChan(bs)
+	bsCh := t.handler.SendRequest(cookie)
+	t.handler.ParseToChan(bsCh)
 	t.handler.Store()
 	log.Printf("Task %s executed successfully", t.config.Name)
 }

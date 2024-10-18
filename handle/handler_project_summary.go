@@ -38,8 +38,21 @@ func (h *ProjectSummaryHandler) Name() string {
 	return "ProjectSummaryHandler"
 }
 
-func (h *ProjectSummaryHandler) SendRequest(cookie string) (<-chan []byte, error) {
-	return nil, nil
+func (h *ProjectSummaryHandler) SendRequest(cookie string) <-chan []byte {
+	data := make(chan []byte)
+
+	go func() {
+		for {
+			bs, err := h.req.SendRequest(cookie)
+			if err != nil {
+				xlog.Error("Failed to send request cookie: %s, err: %s", cookie, err)
+				return
+			}
+			data <- bs
+		}
+	}()
+
+	return data
 }
 
 func (h *ProjectSummaryHandler) ParseToChan(data <-chan []byte) {

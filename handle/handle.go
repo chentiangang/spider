@@ -5,9 +5,9 @@ import "spider/config"
 type Handler interface {
 	Init(config config.TaskConfig) error
 	Name() string
-	SendRequest(cookie string) (<-chan []byte, error) // 发送请求并返回数据通道
-	ParseToChan(data <-chan []byte)                   // 解析响应数据并返回解析结果通道
-	Store()                                           // 存储解析后的数据
+	SendRequest(cookie string) <-chan []byte // 发送请求并返回数据通道
+	ParseToChan(data <-chan []byte)          // 解析响应数据并返回解析结果通道
+	Store()                                  // 存储解析后的数据
 }
 
 var Handlers []Handler

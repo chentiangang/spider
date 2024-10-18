@@ -17,27 +17,29 @@ type Request struct {
 }
 
 func NewRequest(cfg config.RequestConfig) (*Request, error) {
-	// 解析 URL
-	parsedURL, err := url.Parse(cfg.URL)
-	if err != nil {
-		return nil, err
-	}
+	//// 解析 URL
+	//parsedURL, err := url.Parse(cfg.URL)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//// 如果有 URL 查询参数，将它们添加到 URL 查询字符串中
+	//if len(cfg.Params) > 0 {
+	//	query := parsedURL.Query() // 获取现有的查询参数
+	//	for key, value := range cfg.Params {
+	//		query.Set(key, value) // 设置新的查询参数
+	//	}
+	//	parsedURL.RawQuery = query.Encode() // 将查询参数附加到 URL
+	//}
 
-	// 如果有 URL 查询参数，将它们添加到 URL 查询字符串中
-	if len(cfg.Params) > 0 {
-		query := parsedURL.Query() // 获取现有的查询参数
-		for key, value := range cfg.Params {
-			query.Set(key, value) // 设置新的查询参数
-		}
-		parsedURL.RawQuery = query.Encode() // 将查询参数附加到 URL
-	}
+	URL, err := buildURL(cfg)
 
 	// 根据请求方法构造请求
 	var req *http.Request
 	if cfg.Method == http.MethodPost {
-		req, err = http.NewRequest(cfg.Method, parsedURL.String(), strings.NewReader(cfg.Body))
+		req, err = http.NewRequest(cfg.Method, URL, strings.NewReader(cfg.Body))
 	} else {
-		req, err = http.NewRequest(cfg.Method, parsedURL.String(), nil) // GET 请求不需要 Body
+		req, err = http.NewRequest(cfg.Method, URL, nil) // GET 请求不需要 Body
 	}
 	if err != nil {
 		return nil, err
@@ -49,6 +51,23 @@ func NewRequest(cfg config.RequestConfig) (*Request, error) {
 	}
 
 	return &Request{req: req}, nil
+}
+
+func buildURL(cfg config.RequestConfig) (string, error) {
+	parsedURL, err := url.Parse(cfg.URL)
+	if err != nil {
+		return "", err
+	}
+
+	// 如果有 URL 查询参数，将它们添加到 URL 查询字符串中
+	if len(cfg.Params) > 0 {
+		query := parsedURL.Query() // 获取现有的查询参数
+		for key, value := range cfg.Params {
+			query.Set(key, value) // 设置新的查询参数
+		}
+		parsedURL.RawQuery = query.Encode() // 将查询参数附加到 URL
+	}
+	return parsedURL.String(), nil
 }
 
 func (r *Request) SendRequest(cookie string) (bs []byte, err error) {
