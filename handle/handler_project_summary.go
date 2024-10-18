@@ -90,7 +90,7 @@ func (h *ProjectSummaryHandler) SendRequest(cookie string) <-chan []byte {
 
 		res := h.parse(bs)
 
-		h.reqConfig.Params["pageNum"] = "1"
+		h.reqConfig.Params["page"] = "1"
 		h.reqConfig.Params["pageSize"] = fmt.Sprintf("%d", res.Data.Total)
 		h.req, err = NewRequest(h.reqConfig)
 		if err != nil {
