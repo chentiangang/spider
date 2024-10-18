@@ -9,8 +9,18 @@ import (
 )
 
 type Config struct {
-	Tasks    []TaskConfig `yaml:"tasks"`
-	Includes []string     `yaml:"includes"`
+	Database []MySQLConfig `yaml:"database"`
+	Tasks    []TaskConfig  `yaml:"tasks"`
+	Includes []string      `yaml:"includes"`
+}
+
+type MySQLConfig struct {
+	Name     string `yaml:"name"`
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	DBName   string `yaml:"dbname"`
 }
 
 // TaskConfig 是任务的结构体定义
@@ -39,8 +49,8 @@ type RequestConfig struct {
 }
 
 type StorageConfig struct {
-	StorerName   string `yaml:"storer_name"`
-	DatabaseName string `yaml:"database_name"`
+	StorageName string `yaml:"storage_name"`
+	//DatabaseName string `yaml:"database_name"`
 	//Store        storage.Storage[T] `yaml:"-"`
 }
 
@@ -85,4 +95,13 @@ func loadSubConfig(filePath string) (*Config, error) {
 	}
 
 	return &subConfig, nil
+}
+
+func (c Config) GetDatabaseConfig(name string) *MySQLConfig {
+	for _, db := range c.Database {
+		if db.Name == name {
+			return &db
+		}
+	}
+	return nil
 }
