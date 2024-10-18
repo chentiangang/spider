@@ -19,7 +19,6 @@ func init() {
 func CreateTaskHandler(cfg config.TaskConfig) Handler {
 	for _, h := range Handlers {
 		if h.Name() == cfg.HandlerName {
-			h.Init(cfg)
 			return h
 		}
 	}

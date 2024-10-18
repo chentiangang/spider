@@ -3,23 +3,20 @@ package handle
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"spider/config"
+	"spider/utils"
 
 	"github.com/chentiangang/xlog"
 )
 
 type ProjectSummaryHandler struct {
 	//Resp   ProjectSummaryResponse
-	RespCh chan ProjectSummaryResponse
-	db     *sql.DB
-	req    *Request
+	reqConfig config.RequestConfig
+	RespCh    chan ProjectSummaryResponse
+	db        *sql.DB
+	req       *Request
 }
-
-//type ProjectSummaryResponse struct {
-//	Code    string
-//	Message string
-//	Data    interface{}
-//}
 
 type ProjectSummaryResponse struct {
 	Code int `json:"code"`
@@ -65,6 +62,7 @@ func (h *ProjectSummaryHandler) Init(cfg config.TaskConfig) error {
 	h.RespCh = make(chan ProjectSummaryResponse)
 	var err error
 	h.req, err = NewRequest(cfg.Request)
+	h.reqConfig = cfg.Request
 	h.db = NewConn(cfg.Storage)
 	if err != nil {
 		xlog.Error("Failed to init Handler %s, err: %s:", h.Name(), err)
@@ -83,7 +81,6 @@ func (h *ProjectSummaryHandler) SendRequest(cookie string) <-chan []byte {
 
 	go func() {
 		defer close(data)
-
 		bs, err := h.req.SendRequest(cookie)
 		if err != nil {
 			xlog.Error("Failed to send request cookie: %s, err: %s", cookie, err)
@@ -91,8 +88,20 @@ func (h *ProjectSummaryHandler) SendRequest(cookie string) <-chan []byte {
 		}
 
 		res := h.parse(bs)
-		//res.Data.Total
 
+		h.config.Params["pageNum"] = "1"
+		h.config.Params["pageSize"] = fmt.Sprintf("%d", res.Data.Total)
+		h.req, err = NewRequest(h.config)
+		if err != nil {
+			xlog.Error("%s", err)
+			return
+		}
+
+		bs, err = h.req.SendRequest(cookie)
+		if err != nil {
+			xlog.Error("%s")
+			return
+		}
 		data <- bs
 	}()
 
@@ -111,7 +120,12 @@ func (h *ProjectSummaryHandler) parse(data []byte) ProjectSummaryResponse {
 func (h *ProjectSummaryHandler) ParseToChan(data <-chan []byte) {
 	go func() {
 		defer close(h.RespCh)
-		for bs := range data {
+		for {
+			bs, ok := <-data
+			if !ok {
+				xlog.Debug("Channel is closed,no more data need parse.")
+				break
+			}
 			var resp ProjectSummaryResponse
 			err := json.Unmarshal(bs, &resp)
 			if err != nil {
@@ -125,10 +139,18 @@ func (h *ProjectSummaryHandler) ParseToChan(data <-chan []byte) {
 func (h *ProjectSummaryHandler) Store() {
 	go func() {
 		defer h.db.Close()
-		for item := range h.RespCh {
-			_, err := h.db.Exec("insert into", item.Data)
-			if err != nil {
-				xlog.Error("%s", err)
+		for {
+			res, ok := <-h.RespCh
+			if !ok {
+				xlog.Debug("Channel is closed,no more data need store.")
+				break
+			}
+			for _, i := range res.Data.Items {
+				_, err := h.db.Exec("insert into max_compute_project_summary(`project`,`region_cluster`,`quota`,`disk_use`,`disk_use_rate`,`disk_total`) values(?,?,?,?,?,?)",
+					i.Project, "hb-1", i.Quota, utils.ConvertBytesToReadable(i.DiskUse), i.DiskUseRate, utils.ConvertBytesToReadable(i.DiskTotal))
+				if err != nil {
+					xlog.Error("%s", err)
+				}
 			}
 		}
 	}()

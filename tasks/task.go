@@ -23,6 +23,11 @@ func (t *Task) Execute() {
 		return
 	}
 
+	err := t.handler.Init(t.config)
+	if err != nil {
+		xlog.Error("%s", err)
+		return
+	}
 	bsCh := t.handler.SendRequest(cookie)
 	t.handler.ParseToChan(bsCh)
 	t.handler.Store()
