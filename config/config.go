@@ -1,9 +1,12 @@
 package config
 
 import (
+	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"spider/cookie"
+	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -41,15 +44,39 @@ type CookieConfig struct {
 }
 
 type RequestConfig struct {
-	URL     string            `yaml:"url"`
-	Method  string            `yaml:"method"`
-	Headers map[string]string `yaml:"headers"`
-	Body    string            `yaml:"body"`
-	Params  map[string]string `yaml:"params"`
+	URL        string            `yaml:"url"`
+	Method     string            `yaml:"method"`
+	Headers    map[string]string `yaml:"headers"`
+	Body       string            `yaml:"body"`
+	BodyParams map[string]string `yaml:"body_params"`
+	Params     map[string]string `yaml:"params"`
+}
+
+func (r *RequestConfig) BuildURL() string {
+	u, err := url.Parse(r.URL)
+	if err != nil {
+		return r.URL // 错误时返回原始 URL
+	}
+
+	q := u.Query()
+	for key, value := range r.Params {
+		q.Add(key, value)
+	}
+	u.RawQuery = q.Encode()
+	return u.String()
+}
+
+func (r *RequestConfig) BuildBody() string {
+	body := r.Body
+	for key, value := range r.BodyParams {
+		body = strings.Replace(body, fmt.Sprintf("{%s}", key), value, -1)
+	}
+	return body
 }
 
 type StorageConfig struct {
-	StorageName string `yaml:"storage_name"`
+	StorageName string       `yaml:"storage_name"`
+	MySQLConfig *MySQLConfig `yaml:"mysql_config"`
 	//DatabaseName string `yaml:"database_name"`
 	//Store        storage.Storage[T] `yaml:"-"`
 }
@@ -66,13 +93,15 @@ func LoadConfig(filePath string) (*Config, error) {
 		return nil, err
 	}
 
+	config.AssignDatabaseConfigs()
+
 	// 加载所有包含的子配置文件
 	for _, include := range config.Includes {
 		subConfig, err := loadSubConfig(include)
 		if err != nil {
 			return nil, err
 		}
-		config.Tasks = append(config.Tasks, subConfig.Tasks...)
+		config.MergeTasks(subConfig.Tasks)
 	}
 
 	return &config, nil
@@ -97,11 +126,28 @@ func loadSubConfig(filePath string) (*Config, error) {
 	return &subConfig, nil
 }
 
-func (c Config) GetDatabaseConfig(name string) *MySQLConfig {
-	for _, db := range c.Database {
-		if db.Name == name {
-			return &db
+func (c *Config) AssignDatabaseConfigs() {
+	for i := range c.Tasks {
+		task := &c.Tasks[i]
+		if task.Storage.MySQLConfig == nil {
+			for _, db := range c.Database {
+				if db.Name == task.Storage.StorageName {
+					task.Storage.MySQLConfig = &db
+				}
+			}
 		}
 	}
-	return nil
+}
+
+func (c *Config) MergeTasks(subTasks []TaskConfig) {
+	taskMap := make(map[string]bool)
+	for _, task := range c.Tasks {
+		taskMap[task.Name] = true
+	}
+
+	for _, subTask := range subTasks {
+		if !taskMap[subTask.Name] {
+			c.Tasks = append(c.Tasks, subTask)
+		}
+	}
 }
