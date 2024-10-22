@@ -44,6 +44,7 @@ type CookieConfig struct {
 	Schedule    string          `yaml:"schedule"`
 }
 
+// RequestConfig 是请求配置的结构定义
 type RequestConfig struct {
 	URL        string            `yaml:"url"`
 	Method     string            `yaml:"method"`
@@ -53,6 +54,7 @@ type RequestConfig struct {
 	Params     map[string]string `yaml:"params"`
 }
 
+// BuildURL 是根据参数生成URL
 func (r *RequestConfig) BuildURL() string {
 	u, err := url.Parse(r.URL)
 	if err != nil {
@@ -67,6 +69,7 @@ func (r *RequestConfig) BuildURL() string {
 	return u.String()
 }
 
+// BuildBody 是根据配置生成body
 func (r *RequestConfig) BuildBody() string {
 	body := r.Body
 	for key, value := range r.BodyParams {
