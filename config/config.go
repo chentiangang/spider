@@ -77,8 +77,6 @@ func (r *RequestConfig) BuildBody() string {
 type StorageConfig struct {
 	StorageName string       `yaml:"storage_name"`
 	MySQLConfig *MySQLConfig `yaml:"mysql_config"`
-	//DatabaseName string `yaml:"database_name"`
-	//Store        storage.Storage[T] `yaml:"-"`
 }
 
 // LoadConfig 加载主配置文件，并读取包含的所有子任务配置文件
