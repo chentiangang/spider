@@ -11,7 +11,6 @@ import (
 )
 
 type ProjectSummaryHandler struct {
-	//Resp   ProjectSummaryResponse
 	reqConfig config.RequestConfig
 	RespCh    chan ProjectSummaryResponse
 	db        *sql.DB
