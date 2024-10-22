@@ -36,6 +36,7 @@ type TaskConfig struct {
 	Storage     StorageConfig `yaml:"storage"`
 }
 
+// CookieConfig 是cookie配置的结构定义
 type CookieConfig struct {
 	FetcherName string          `yaml:"fetcher_name"`
 	LoginURL    string          `yaml:"login_url"`
@@ -124,6 +125,7 @@ func loadSubConfig(filePath string) (*Config, error) {
 	return &subConfig, nil
 }
 
+// AssignDatabaseConfigs 是根据配置的存储器名称加载存储配置
 func (c *Config) AssignDatabaseConfigs() {
 	for i := range c.Tasks {
 		task := &c.Tasks[i]
@@ -137,6 +139,7 @@ func (c *Config) AssignDatabaseConfigs() {
 	}
 }
 
+// MergeTasks 是将includes文件里的任务合并
 func (c *Config) MergeTasks(subTasks []TaskConfig) {
 	taskMap := make(map[string]bool)
 	for _, task := range c.Tasks {
