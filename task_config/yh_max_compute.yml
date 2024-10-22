@@ -1,0 +1,59 @@
+tasks:
+  - name: "远航maxCompute数据获取"
+    schedule: "00 09,12,18 * * ?"
+    handler_name: "ProjectSummaryHandler"
+    cookie:
+      name: "asobcc_fetcher"
+      login_url: "https://hb-1.ops.console.ops.sgmc.sgcc.com.cn/aso/login"
+      schedule: "30 08,11,17 * * ?"
+      actions:
+        - type: "wait"
+          selector: "#username"
+          by: "ByID"
+        - type: "sendKeys"
+          selector: "#username"
+          value: "hubei-kongsd"
+          by: "ByID"
+        - type: "sendKeys"
+          selector: "#password"
+          value: "kongsd!@2024"
+          by: "ByID"
+        - type: "sleep"
+          value: "2"
+        - type: "click"
+          selector: "#form > div > form > div:nth-child(3) > div > button"
+          by: "ByID"
+        - type: "wait"
+          selector: "#icestarkNode > div > div.next-card.next-card.next-card-free.next-card-show-divider.teamix-pro-card > div > div > div"
+    request:
+      url: "https://abm.bjdc-1.ops.sgmc.sgcc.com.cn/gateway/v2/apps/california/project/proprietary_cloud/get_project_info_summary"
+      method: "GET"
+      headers:
+        scheme: "https"
+        Accept: 'application/json, text/plain, */*"'
+        Referer: 'host+"/"'
+        Connection: "keep-alive"
+        Accept-Language: "zh-CN,zh;q=0.9"
+        Sec-Ch-Ua: '".Not/A)Brand";v="99", "Google Chrome";v="127", "Chromium";v="127"'
+        Sec-Ch-Ua-Mobile: '"?0"'
+        Sec-Ch-Ua-Platform: '"Windows"'
+        Sec-Fetch-Dest: "empty"
+        Sec-Fetch-Mode: "cors"
+        Sec-Fetch-Site: "same-origin"
+        User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.66 Safari/537.36"
+        X-Biz-App: "eodps"
+        X-Env: "prod"
+    params:
+      parameters: "{}"
+      elementId: "eodps:TABLE:business.workbench.my_project.get_project_info_summary"
+      domain: "hb-1"
+      cluster: "OdpsComputeCluster-A-20200518-dc0e"
+      user_id: "1784318330045948"
+      filters_permanent: '{"region": "","cluster": "OdpsComputeCluster-A-20200518-dc0e","quota": "","project": "", "tianji_region": "hb-1" }'
+      page: "1"
+      pageSize: "10"
+    storage:
+      type: "database"
+      db_name: "db_connection_string"
+      replace_old: true
+
