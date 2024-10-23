@@ -23,6 +23,8 @@ func main() {
 
 	// 创建调度器
 	sched := scheduler.NewScheduler()
+
+	// 初始化并添加cookie fetcher
 	for _, i := range cfg.Tasks {
 		if i.Cookie.Actions != nil {
 			cookieFetcher := cookie.CreateFetcher(i.Cookie.Actions, i.Cookie.FetcherName, i.Cookie.LoginURL)
