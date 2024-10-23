@@ -43,7 +43,6 @@ func bccSSOToken(cookie string) string {
 
 	r.Header.Add("cookie", cookie)
 	r.Header.Add("authority", "abm.bjdc-1.ops.sgmc.sgcc.com.cn")
-	//r.Header.Add("path", "/gateway/v2/common/authProxy/auth/user/info?appId=bcc&noCache=1")
 	r.Header.Add("scheme", "https")
 	r.Header.Add("accept", "application/json, text/plain, */*")
 	r.Header.Add("accept-encoding", "gzip, deflate, br")
