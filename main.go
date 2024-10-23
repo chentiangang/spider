@@ -10,9 +10,9 @@ import (
 
 var cookieManager cookie.Manager
 
-func init() {
-	//cookieManager.Register("")
-}
+//func init() {
+//cookieManager.Register("")
+//}
 
 func main() {
 	// 加载配置
