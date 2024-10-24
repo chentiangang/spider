@@ -61,7 +61,11 @@ func (h *ProjectSummaryHandler) Init(cfg config.TaskConfig) error {
 	h.RespCh = make(chan ProjectSummaryResponse)
 	var err error
 	h.reqConfig = cfg.Request
-	h.db = NewConn(*cfg.Storage.MySQLConfig)
+	if cfg.Storage.MySQLConfig != nil {
+		h.db = NewConn(*cfg.Storage.MySQLConfig)
+	} else {
+		xlog.Error("MySQLConfig is nil")
+	}
 	if err != nil {
 		xlog.Error("Failed to init Handler %s, err: %s:", h.Name(), err)
 		return err

@@ -95,8 +95,6 @@ func LoadConfig(filePath string) (*Config, error) {
 		return nil, err
 	}
 
-	config.AssignDatabaseConfigs()
-
 	// 加载所有包含的子配置文件
 	for _, include := range config.Includes {
 		subConfig, err := loadSubConfig(include)
@@ -105,6 +103,9 @@ func LoadConfig(filePath string) (*Config, error) {
 		}
 		config.MergeTasks(subConfig.Tasks)
 	}
+
+	// 加载所有任务的数据库配置
+	config.AssignDatabaseConfigs()
 
 	return &config, nil
 }
