@@ -124,12 +124,7 @@ func (h *ProjectSummaryHandler) parse(data []byte) ProjectSummaryResponse {
 func (h *ProjectSummaryHandler) ParseToChan(data <-chan []byte) {
 	go func() {
 		defer close(h.RespCh)
-		for {
-			bs, ok := <-data
-			if !ok {
-				xlog.Debug("Channel is closed,no more data need parse.")
-				break
-			}
+		for bs := range data {
 			var resp ProjectSummaryResponse
 			err := json.Unmarshal(bs, &resp)
 			if err != nil {
@@ -137,18 +132,14 @@ func (h *ProjectSummaryHandler) ParseToChan(data <-chan []byte) {
 			}
 			h.RespCh <- resp
 		}
+		xlog.Debug("Channel is closed,no more data need parse.")
 	}()
 }
 
 func (h *ProjectSummaryHandler) Store() {
 	go func() {
 		defer h.db.Close()
-		for {
-			res, ok := <-h.RespCh
-			if !ok {
-				xlog.Debug("Channel is closed,no more data need store.")
-				break
-			}
+		for res := range h.RespCh {
 			for _, i := range res.Data.Items {
 				_, err := h.db.Exec("insert into max_compute_project_summary(`project`,`region_cluster`,`quota`,`disk_use`,`disk_use_rate`,`disk_total`) values(?,?,?,?,?,?)",
 					i.Project, "hb-1", i.Quota, utils.ConvertBytesToReadable(i.DiskUse), i.DiskUseRate, utils.ConvertBytesToReadable(i.DiskTotal))
@@ -157,5 +148,6 @@ func (h *ProjectSummaryHandler) Store() {
 				}
 			}
 		}
+		xlog.Debug("Channel is closed,no more data need store.")
 	}()
 }
