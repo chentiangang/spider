@@ -36,10 +36,12 @@ func main() {
 
 	// 初始化并添加任务
 	for _, taskCfg := range cfg.Tasks {
-		task := tasks.NewTask(taskCfg, cookieManager.GetCookie)
-		if err := sched.AddTask(taskCfg.Schedule, task.Execute); err != nil {
-			log.Printf("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
-			continue
+		if cookieManager.GetCookie(taskCfg.Cookie.FetcherName) != "" {
+			task := tasks.NewTask(taskCfg, cookieManager.GetCookie)
+			if err := sched.AddTask(taskCfg.Schedule, task.Execute); err != nil {
+				log.Printf("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
+				continue
+			}
 		}
 	}
 

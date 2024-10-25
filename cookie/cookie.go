@@ -36,5 +36,6 @@ func (m *Manager) Register(name string, fetcher Fetcher) {
 }
 
 func (m *Manager) GetCookie(name string) string {
+
 	return m.fetchers[name].String()
 }
