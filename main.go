@@ -35,41 +35,38 @@ func main() {
 			sched.AddTask(i.Cookie.Schedule, fetcher.Update)
 
 			if i.Cookie.HttpServerPath != "" {
-				// 创建一个局部变量用于捕获当前的路径和 fetcher 名称
-				path := i.Cookie.HttpServerPath
-				fetcherName := i.Cookie.FetcherName
-				http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-					log.Println(r.Host, r.RequestURI)
-					res := cookieManager.GetCookie(fetcherName)
-					w.Write([]byte(res))
-				})
+				handler := CreateCookieHttpHandlerFunc(i.Cookie.FetcherName, &cookieManager)
+				http.HandleFunc(i.Cookie.HttpServerPath, handler)
 			}
 		}
 	}
 
-	// 初始化并添加任务
-	for _, taskCfg := range cfg.Tasks {
-		if taskCfg.HandlerName == "" {
-			continue
-		}
-		if taskCfg.Request == nil {
-			continue
-		}
-
-		if cookieManager.GetCookie(taskCfg.Cookie.FetcherName) != "" {
-			task := tasks.NewTask(taskCfg, cookieManager.GetCookie)
-			if err := sched.AddTask(taskCfg.Schedule, task.Execute); err != nil {
-				log.Printf("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
-				continue
-			}
-		}
-	}
+	addTaskScheduler(cfg, sched, &cookieManager)
 
 	// 启动调度器
 	sched.Start()
-
 	http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", cfg.HttpPort), nil)
+}
 
-	// 阻塞主线程
-	//select {}
+func CreateCookieHttpHandlerFunc(fetcherName string, cm *cookie.Manager) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.Host, r.RequestURI)
+		res := cm.GetCookie(fetcherName)
+		w.Write([]byte(res))
+	}
+}
+
+func addTaskScheduler(cfg *config.Config, sched *scheduler.Scheduler, cm *cookie.Manager) {
+	for _, taskCfg := range cfg.Tasks {
+		if taskCfg.HandlerName == "" || taskCfg.Request == nil {
+			continue
+		}
+
+		if cm.GetCookie(taskCfg.Cookie.FetcherName) != "" {
+			task := tasks.NewTask(taskCfg, cm.GetCookie)
+			if err := sched.AddTask(taskCfg.Schedule, task.Execute); err != nil {
+				log.Printf("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
+			}
+		}
+	}
 }
