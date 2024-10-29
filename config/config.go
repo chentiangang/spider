@@ -14,6 +14,7 @@ import (
 type Config struct {
 	Database []MySQLConfig `yaml:"database"`
 	Tasks    []TaskConfig  `yaml:"tasks"`
+	HttpPort int           `yaml:"http_port"`
 	Includes []string      `yaml:"includes"`
 }
 
@@ -28,20 +29,26 @@ type MySQLConfig struct {
 
 // TaskConfig 是任务的结构体定义
 type TaskConfig struct {
-	Name        string        `yaml:"name"`
-	Schedule    string        `yaml:"schedule"`
-	HandlerName string        `yaml:"handler_name"`
-	Cookie      CookieConfig  `yaml:"cookie"`
-	Request     RequestConfig `yaml:"request"`
-	Storage     StorageConfig `yaml:"storage"`
+	Name        string         `yaml:"name"`
+	Schedule    string         `yaml:"schedule"`
+	HandlerName string         `yaml:"handler_name"`
+	Cookie      CookieConfig   `yaml:"cookie"`
+	Request     *RequestConfig `yaml:"request"`
+	Storage     *StorageConfig `yaml:"storage"`
 }
 
 // CookieConfig 是cookie配置的结构定义
 type CookieConfig struct {
-	FetcherName string          `yaml:"fetcher_name"`
-	LoginURL    string          `yaml:"login_url"`
-	Actions     []cookie.Action `yaml:"actions"`
-	Schedule    string          `yaml:"schedule"`
+	FetcherName    string          `yaml:"fetcher_name"`
+	LoginURL       string          `yaml:"login_url"`
+	Actions        []cookie.Action `yaml:"actions"`
+	Schedule       string          `yaml:"schedule"`
+	HttpServerPath string          `yaml:"http_server_path"`
+}
+
+type HttpServerConfig struct {
+	Port int    `yaml:"port"`
+	Path string `yaml:"path"`
 }
 
 // RequestConfig 是请求配置的结构定义
@@ -133,10 +140,12 @@ func loadSubConfig(filePath string) (*Config, error) {
 func (c *Config) AssignDatabaseConfigs() {
 	for i := range c.Tasks {
 		task := &c.Tasks[i]
-		if task.Storage.MySQLConfig == nil {
-			for _, db := range c.Database {
-				if db.Name == task.Storage.StorageName {
-					task.Storage.MySQLConfig = &db
+		if task.Storage != nil {
+			if task.Storage.MySQLConfig == nil && task.Storage.StorageName != "" {
+				for _, db := range c.Database {
+					if db.Name == task.Storage.StorageName {
+						task.Storage.MySQLConfig = &db
+					}
 				}
 			}
 		}

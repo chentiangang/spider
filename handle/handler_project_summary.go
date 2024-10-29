@@ -11,7 +11,7 @@ import (
 )
 
 type ProjectSummaryHandler struct {
-	reqConfig config.RequestConfig
+	reqConfig *config.RequestConfig
 	RespCh    chan ProjectSummaryResponse
 	db        *sql.DB
 	req       *Request
@@ -84,7 +84,7 @@ func (h *ProjectSummaryHandler) SendRequest(cookie string) <-chan []byte {
 	go func() {
 		defer close(data)
 		var err error
-		h.req, err = NewRequest(h.reqConfig)
+		h.req, err = NewRequest(*h.reqConfig)
 		bs, err := h.req.SendRequest(cookie)
 		if err != nil {
 			xlog.Error("Failed to send request cookie: %s, err: %s", cookie, err)
@@ -95,7 +95,7 @@ func (h *ProjectSummaryHandler) SendRequest(cookie string) <-chan []byte {
 
 		h.reqConfig.Params["page"] = "1"
 		h.reqConfig.Params["pageSize"] = fmt.Sprintf("%d", res.Data.Total)
-		h.req, err = NewRequest(h.reqConfig)
+		h.req, err = NewRequest(*h.reqConfig)
 		if err != nil {
 			xlog.Error("%s", err)
 			return

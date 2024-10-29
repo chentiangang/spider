@@ -11,6 +11,7 @@ var Fetchers []Fetcher
 
 func init() {
 	Fetchers = append(Fetchers, &AsoBccFetcher{})
+	Fetchers = append(Fetchers, &SjztFetcher{})
 }
 
 func CreateFetcher(actions []Action, name string, url string) Fetcher {
