@@ -29,10 +29,10 @@ func main() {
 	// 初始化并添加cookie fetcher
 	for _, i := range cfg.Tasks {
 		if i.Cookie.Actions != nil {
-			cookieFetcher := cookie.CreateFetcher(i.Cookie.Actions, i.Cookie.FetcherName, i.Cookie.LoginURL)
-			cookieFetcher.Update()
-			cookieManager.Register(i.Cookie.FetcherName, cookieFetcher)
-			sched.AddTask(i.Cookie.Schedule, cookieFetcher.Update)
+			fetcher := cookie.CreateFetcher(i.Cookie.Actions, i.Cookie.FetcherName, i.Cookie.LoginURL)
+			fetcher.Update()
+			cookieManager.Register(i.Cookie.FetcherName, fetcher)
+			sched.AddTask(i.Cookie.Schedule, fetcher.Update)
 
 			if i.Cookie.HttpServerPath != "" {
 				// 创建一个局部变量用于捕获当前的路径和 fetcher 名称
