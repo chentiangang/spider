@@ -1,7 +1,6 @@
 package tasks
 
 import (
-	"log"
 	"spider/config"
 	"spider/handle"
 	"sync"
@@ -46,7 +45,7 @@ func (t *Task) Execute() {
 	}()
 
 	wg.Wait()
-	log.Printf("Task %s executed successfully", t.config.Name)
+	xlog.Debug("Task %s executed successfully", t.config.Name)
 }
 
 // NewTask 是初始化一个Task 实例

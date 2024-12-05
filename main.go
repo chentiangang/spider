@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"spider/config"
 	"spider/cookie"
 	"spider/scheduler"
 	"spider/tasks"
+
+	"github.com/chentiangang/xlog"
 )
 
 var cookieManager cookie.Manager
@@ -22,7 +23,7 @@ func main() {
 	// 加载配置
 	cfg, err := config.LoadConfig(*configPath)
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		xlog.Fatal("Failed to load config: %v", err)
 	}
 
 	// 创建调度器
@@ -52,7 +53,7 @@ func main() {
 
 func CreateCookieHttpHandlerFunc(fetcherName string, cm *cookie.Manager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.Host, r.RequestURI)
+		xlog.Debug("%s %s", r.Host, r.RequestURI)
 		res := cm.GetCookie(fetcherName)
 		w.Write([]byte(res))
 	}
@@ -67,7 +68,7 @@ func addTaskScheduler(cfg *config.Config, sched *scheduler.Scheduler, cm *cookie
 		if cm.GetCookie(taskCfg.Cookie.FetcherName) != "" {
 			task := tasks.NewTask(taskCfg, cm.GetCookie)
 			if err := sched.AddTask(taskCfg.Schedule, task.Execute); err != nil {
-				log.Printf("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
+				xlog.Error("Failed to add task %s to scheduler: %v", taskCfg.Name, err)
 			}
 		}
 	}

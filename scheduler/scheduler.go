@@ -1,8 +1,7 @@
 package scheduler
 
 import (
-	"log"
-
+	"github.com/chentiangang/xlog"
 	cron "github.com/robfig/cron/v3"
 )
 
@@ -29,7 +28,7 @@ func (s *Scheduler) AddTask(schedule string, task func()) error {
 // Start 开始调度
 func (s *Scheduler) Start() {
 	s.cron.Start()
-	log.Println("Scheduler started")
+	xlog.Debug("Scheduler started")
 }
 
 // Stop 停止调度
