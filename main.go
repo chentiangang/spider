@@ -17,6 +17,8 @@ var cookieManager cookie.Manager
 func main() {
 	// 定义配置文件参数
 	configPath := flag.String("config", "config.yaml", "Path to the configuration file")
+	logPath := flag.String("log", "./spider.log", "Path to the log file")
+	xlog.Init("file", "debug", *logPath, "spider")
 
 	// 解析命令行参数
 	flag.Parse()
