@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,13 +13,14 @@ import (
 
 var cookieManager cookie.Manager
 
-//func init() {
-//cookieManager.Register("")
-//}
-
 func main() {
+	// 定义配置文件参数
+	configPath := flag.String("config", "config.yaml", "Path to the configuration file")
+
+	// 解析命令行参数
+	flag.Parse()
 	// 加载配置
-	cfg, err := config.LoadConfig("config.yml")
+	cfg, err := config.LoadConfig(*configPath)
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
