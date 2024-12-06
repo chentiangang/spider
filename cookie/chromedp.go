@@ -99,9 +99,11 @@ func (cm *Chromedp) Update() {
 	}
 	opts = append(chromedp.DefaultExecAllocatorOptions[:], opts...)
 
-	ctx, _ := chromedp.NewExecAllocator(context.Background(), opts...)
+	ctx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer cancel()
+
 	newctx, cancel := chromedp.NewContext(ctx)
-	defer chromedp.Cancel(newctx)
+	defer cancel()
 
 	chromedp.Run(newctx, make([]chromedp.Action, 0, 1)...)
 
